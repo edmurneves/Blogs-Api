@@ -1,16 +1,20 @@
 const UserSchema = (sequelize, DataTypes) => {
   const UserTable = sequelize.define('User', {
-    id: DataTypes.INTEGER,
+    id: { 
+      type: DataTypes.INTEGER, 
+      primaryKey: true, 
+      autoIncrement: true 
+    },
     displayName: DataTypes.STRING,
     email: DataTypes.STRING,
     password: DataTypes.STRING,
-    image: DataTypes.STRING
+    image: DataTypes.STRING    
   }, {
     timestamps: false
   });
 
   UserTable.associate = (models) => {
-    UserTable.hasMany(models.BlogPost, { as: 'blogposts', foreignKey: 'userId'});
+    UserTable.hasMany(models.BlogPost, { foreignKey: 'userId', as: 'blogposts'});
   }
 
   return UserTable;
