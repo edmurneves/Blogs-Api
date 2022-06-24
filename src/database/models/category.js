@@ -6,7 +6,9 @@ const CategorySchema = (sequelize, DataTypes) => {
             autoIncrement: true
         },
         name: DataTypes.STRING,
-    });
+    }, {
+        timestamps: false
+      });
 
     return CategoryTable;
 }
