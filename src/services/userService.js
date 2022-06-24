@@ -8,6 +8,18 @@ const getUsers = async () => {
     return users;
 };
 
+const getById = async (id) => {
+    const user = await User.findByPk(id, {
+        attributes: { exclude: ['password'] },
+    });
+
+    if (!user) {
+        const error = { status: 404, message: 'User does not exist' };
+        throw error;
+    }
+    return user;
+};
+
 const createUser = async ({ displayName, email, password, image }) => {
     const newUser = await User.findOne({
         attributes: ['displayName', 'email'],
@@ -29,4 +41,5 @@ const createUser = async ({ displayName, email, password, image }) => {
 module.exports = {
     getUsers,
     createUser,
+    getById,
 };
