@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+
 const jwt = require('jsonwebtoken');
 
 const config = require('../database/config/config');
@@ -39,7 +40,23 @@ const getAllPost = async () => {
     return blogs;
 };
 
+const getById = async (id) => {    
+    const blog = await BlogPost.findByPk(id, {        
+        include: [
+            { model: User, as: 'user', attributes: { exclude: ['password'] } },
+            { model: Category, as: 'categories', through: { attributes: [] } },
+        ],
+    });    
+
+    if (!blog) {
+        const error = { status: 404, message: 'Post does not exist' };
+        throw error;
+    }   
+    return blog;
+};
+
 module.exports = {
     createPost,
     getAllPost,
+    getById,
 };
