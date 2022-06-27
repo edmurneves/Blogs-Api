@@ -22,4 +22,10 @@ postRouter.get('/', authenticateMiddleware, async (req, res) => {
     res.status(200).json(posts);
 });
 
+postRouter.get('/:id', authenticateMiddleware, async (req, res) => {
+    const { id } = req.params;
+    const post = await postService.getById(id);
+    res.status(200).json(post);
+});
+
 module.exports = postRouter;
