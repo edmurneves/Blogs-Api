@@ -4,12 +4,12 @@ const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = process.env || 'minhachave';
 
 const jwtConfig = {
-    expiresIn: '20m',
+    expiresIn: '60m',
     algorithm: 'HS256',
 };
 
-const generateJWTToken = ({ displayName, email }) => 
-    jwt.sign({ displayName, email }, JWT_SECRET, jwtConfig);
+const generateJWTToken = ({ id, displayName, email }) => 
+    jwt.sign({ id, displayName, email }, JWT_SECRET, jwtConfig);
 
 const authenticateToken = async (token) => {
     if (!token) {
