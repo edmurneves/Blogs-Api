@@ -1,26 +1,33 @@
-const { BlogPost, User, Category } = require('../database/models');
+const Sequelize = require('sequelize');
+const jwt = require('jsonwebtoken');
 
-// const createPost = async ({ title, content, categoryIds }) => {
-//     if (!title || !content) {
-//         const error = { status: 400, message: 'Some required fields are missing' };
-//         throw error;
-//     }
+const config = require('../database/config/config');
+const { BlogPost, PostCategory, User, Category } = require('../database/models');
 
-//     if (categoryIds.length < 1) {
-//         const error = { status: 400, message: '"categoryIds" not found' };
-//         throw error;
-//     }
+const sequelize = new Sequelize(config.development);
 
-//     const user = await User.findOne({
-//         attributes: ['displayName', 'email'],
-//         where: { email, password },
-//     });
+const secretKey = process.env.JWT_SECRET;
 
-//     if (!user) {
-//         const error = { status: 400, message: 'Invalid fields' };
-//         throw error;
-//     }
-// };
+const createPost = async (token, title, content, categoryIds) => {    
+    const { id } = jwt.verify(token, secretKey);  
+    
+    try {
+        const newPost = await sequelize.transaction(async (t) => {            
+            const post = await BlogPost.create(
+                { title, content, userId: id, published: new Date(), updated: new Date() },
+                { transaction: t },
+            );
+            await PostCategory.bulkCreate(categoryIds.map((idc) => (
+                { postId: post.id, categoryId: idc })),
+                { transaction: t });
+            return post;
+        });
+        return newPost;        
+    } catch (error) {
+        const err = { status: 400, message: '"categoryIds" not found' };
+        throw err;
+    }
+};
 
 const getAllPost = async () => {
     const blogs = await BlogPost.findAll({
@@ -33,6 +40,6 @@ const getAllPost = async () => {
 };
 
 module.exports = {
-    // createPost,
+    createPost,
     getAllPost,
 };
