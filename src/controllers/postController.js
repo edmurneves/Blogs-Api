@@ -41,4 +41,11 @@ postRouter.put('/:id', authenticateMiddleware, checkPostOwner, async (req, res) 
     res.status(200).json(updatedPost);
 });
 
+postRouter.delete('/:id', authenticateMiddleware, checkPostOwner, async (req, res) => {
+    const { id } = req.params;
+    await postService.removePost(id);
+
+    res.status(204).end();
+});
+
 module.exports = postRouter;
