@@ -5,7 +5,7 @@ const secretKey = process.env.JWT_SECRET;
 
 const checkPostOwner = async (req, res, next) => {
     const token = req.headers.authorization;
-    console.log(token);
+    
     const { id } = jwt.verify(token, secretKey);
     const post = await postService.getById(req.params.id);
 
