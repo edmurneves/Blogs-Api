@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const { Op } = require('sequelize');
 
 const jwt = require('jsonwebtoken');
 
@@ -40,7 +41,7 @@ const getAllPost = async () => {
     return blogs;
 };
 
-const getById = async (id) => {    
+const getById = async (id) => {       
     const blog = await BlogPost.findByPk(id, {        
         include: [
             { model: User, as: 'user', attributes: { exclude: ['password'] } },
@@ -68,10 +69,32 @@ const removePost = async (id) => {
     return true;
 };
 
+const searchPost = async (q) => {    
+    if (!q) return getAllPost();
+
+    const posts = await BlogPost.findAll({
+        include: [
+            { model: User, as: 'user', attributes: { exclude: ['password'] } },
+            { model: Category, as: 'categories', through: { attributes: [] } },
+        ],
+        where: {
+            [Op.or]: [
+                { title: { [Op.like]: `%${q}%` } },
+                { content: { [Op.like]: `%${q}%` } },
+            ],
+        },
+    });
+
+    if (!posts) return [];
+
+    return posts;
+};
+
 module.exports = {
     createPost,
     getAllPost,
     getById,
     updatePost,
     removePost,
+    searchPost,
 };
