@@ -38,8 +38,13 @@ const createUser = async ({ displayName, email, password, image }) => {
     return { token };
 };
 
+const deleteOwner = (id) => {
+    User.destroy({ where: { id } });
+};
+
 module.exports = {
     getUsers,
     createUser,
     getById,
+    deleteOwner,
 };
