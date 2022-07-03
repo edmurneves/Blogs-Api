@@ -6,6 +6,14 @@ const checkPostOwner = require('../middleware/checkPostOwner');
 const postRouter = express.Router();
 const postService = require('../services/postService');
 
+postRouter.get('/search', authenticateMiddleware, async (req, res) => {    
+    const { q } = req.query;    
+   
+    const posts = await postService.searchPost(q);
+
+    res.status(200).json(posts);
+});
+
 postRouter.post('/', authenticateMiddleware, async (req, res) => {
     const token = req.headers.authorization;
     const { title, content, categoryIds } = req.body;
@@ -18,12 +26,12 @@ postRouter.post('/', authenticateMiddleware, async (req, res) => {
     res.status(201).json(newPost);
 });
 
-postRouter.get('/', authenticateMiddleware, async (req, res) => {
+postRouter.get('/', authenticateMiddleware, async (req, res) => {    
     const posts = await postService.getAllPost();
     res.status(200).json(posts);
 });
 
-postRouter.get('/:id', authenticateMiddleware, async (req, res) => {
+postRouter.get('/:id', authenticateMiddleware, async (req, res) => {    
     const { id } = req.params;
     const post = await postService.getById(id);
     res.status(200).json(post);
