@@ -1,234 +1,884 @@
 # Projeto Blogs-Api
 
-# Contexto
-Este Projeto consiste na criação de Endpoints (APIs), seguindo as regras de contrato de Back-End. 
-O desenvolvimento seguiu a arquitetura utilizando o conceito de camadas MSC - Models, Services e Controllers. Separando as responsabilidades em:  
-> **Controllers:** Responsável pelo recebimento das requisições e validações da entrada de dados (req.body, req.params, authorization etc).  
-> **Service:** Responsável pelas regras de negócio e validações mais específicas.  
-> **Models:** Responsável pelas requisições ao Banco de Dados.
+## Contexto
 
-### Login para autenticação do cliente
+  <summary><strong>👨‍💻 Projeto desenvolvido durante o módulo de Backend da Trybe</strong></summary>
 
-``` 
-{
-    "email": "edmur@gmail.com",
+  Foi desenvolvido neste projeto uma API e um banco de dados para a produção de conteúdo para um blog! 
+
+  A aplicação foi desenvolvida em  `Node.js` usando o pacote `sequelize` para fazer um `CRUD` de posts.  
+  #### Premissas
+
+  1. Os endpoints estarão conectados ao seu banco de dados seguindo os princípios do REST;
+
+  2. Para fazer um post é necessário usuário e login, portanto será trabalhada a **relação entre** `user` e `post`; 
+
+  3. Será necessária a utilização de categorias para os posts, trabalhando, assim, a **relação de** `posts` para `categories` e de `categories` para `posts`.
+
+<br />
+
+---
+
+<summary><strong>Para rodar a aplicação</strong></summary>
+
+1. Clone o repositório
+  * `git clone https://github.com/tryber/sd-018-b-project-blogs-api.git`.
+  * Entre na pasta do repositório que você acabou de clonar:
+    * `cd sd-018-b-project-blogs-api`
+
+2. Instale as dependências [**Caso existam**]
+  * `npm install`
+
+<br />
+
+---
+
+ <summary  id="diagrama"><strong>🎲 Diagrama ER e Entidades</strong></summary>
+
+  #### Diagrama de Entidade-Relacionamento
+
+  As tabelas foram criadas através do Sequelize ORM, utilizando o diagrama o *DER* a seguir:
+
+  ![DER](./public/der.png)
+
+  ---
+  ## Tecnologias utilizadas
+  
+  A aplicação foi desenvolvida utilizando as principais tecnologias.  
+ 
+
+  1. NodeJS
+
+  2. MySQL
+
+  3. ORM Sequelize
+  
+  ---
+  
+  # Requisitos do Projeto
+
+## 1 - Crie migrations para as entidades User, Categories, BlogPosts, PostCategories
+
+- Esse teste fará uma conexão no banco utilizando a configuração de teste do arquivo `src/database/config/config.js`;
+- Suas `migrations` devem estar no diretório correto e respeitar a nomenclatura pedida no requisito;
+- Suas `migrations` devem respeitar o _diagrama de Entidade-Relacionamento_ e o _formato das entidades_, como descrito na seção de [Diagrama ER e Entidades](#diagrama).
+- Exclua na pasta `./src/database/migrations/`, o arquivo `remove-me.js`.
+
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados:</strong></summary>
+
+  * **[Será validado que é possível fazer um INSERT e um SELECT na tabela User]**
+    - O avaliador irá inserir um dado de exemplo na tabela `Users`;
+    - O avaliador irá fazer um select, desse mesmo dado, na tabela `Users`.
+
+  * **[Será validado que é possível fazer um INSERT e um SELECT na tabela Categories]**
+    - O avaliador irá inserir um dado de exemplo na tabela `Categories`;
+    - O avaliador irá fazer um select, desse mesmo dado, na tabela `Categories`.
+
+  * **[Será validado que, a partir de um INSERT em User, é possível fazer um INSERT e um SELECT na tabela BlogPosts]**
+    - Dado que `BlogPosts` possui **uma chave estrangeira** `userId`:
+      - O avaliador irá inserir um dado de exemplo na tabela `Users`;
+    - Desse modo:
+      - O avaliador irá inserir um dado de exemplo na tabela `BlogPosts`;
+      - O avaliador irá fazer um select, desse mesmo dado, na tabela `BlogPosts`.
+
+  * **[Será validado que, a partir de INSERTs em User, Categories e BlogPosts, é possível fazer um INSERT e um SELECT na tabela PostCategories]**
+    - Dado que `PostCategories` possui **uma chave primária composta de duas chaves estrangeiras**, respectivamente, `postId`, `categoryId`:
+      - O avaliador irá inserir um dado de exemplo na tabela `Users`;
+      - O avaliador irá inserir um dado de exemplo na tabela `Categories`;
+      - O avaliador irá inserir um dado de exemplo na tabela `BlogPosts`;
+    - Desse modo:
+      - O avaliador irá inserir um dado de exemplo na tabela `PostCategories`;
+      - O avaliador irá fazer um select, desse mesmo dado, na tabela `PostCategories`.
+
+<br />
+</details>
+
+---
+
+## 2 - Crie o modelo 'User' em 'src/database/models/user.js' com as propriedades corretas
+
+- Sua `model` deve estar no diretório correto e respeitar a nomenclatura pedida no requisito;
+- Sua `model` deve respeitar o _diagrama de Entidade-Relacionamento_ e o _formato das entidades_, como descrito na seção de [Diagrama ER e Entidades](#diagrama).
+
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados:</strong></summary>
+
+  * **[Será validado que existe o arquivo 'user.js']**
+
+  * **[Será validado que o modelo possui o nome 'User']**
+
+  * **[Será validado que o modelo possui a propriedade 'id']**
+
+  * **[Será validado que o modelo possui a propriedade 'displayName']**
+
+  * **[Será validado que o modelo possui a propriedade 'email']**
+
+  * **[Será validado que o modelo possui a propriedade 'password']**
+
+  * **[Será validado que o modelo possui a propriedade 'image']**
+
+<br />
+</details>
+
+---
+
+## 3 - Sua aplicação deve ter o endpoint POST `/login`
+
+- O endpoint deve ser acessível através do URL `/login`;
+- O corpo da requisição deverá seguir o formato abaixo:
+  ```json
+  {
+    "email": "lewishamilton@gmail.com",
     "password": "123456"
-}
- Caso o login seja efetuado com sucesso o endpoint retorna um token no formato JWT.
-{
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2RDbGllbnRlIjoxLCJub21lIjo
-    iRWRtdXIiLCJlbWFpbCI6ImVkbXVyQGdtYWlsLmNvbSIsImlhdCI6MTY1ODcwNDMxNiwiZXhwIjoxN
-    jU4NzkwNzE2fQ.li7rurPex-sxNHUqGZ6NebZa0_zS_Lh0CLLjF_gU9CQ"
-}
-** OBS: As rotas iniciadas em /conta necessitam autenticação, portanto o token deve ser inserido no header da requisição. 
-
-``` 
-
-### Requisições para investimento
-
-#### *POST (/investimentos/comprar)*
-
-``` 
-{
-  “codCliente”: integer,	// código do cliente (identificador único)
-  “codAtivo”: integer,		// código de identificação única do ativo
-  “qtdeAtivo”: integer,	  // quantidade de ações a serem compradas
-}
-``` 
-  O endpoint recebe como entrada o código do ativo, a quantidade de ações compradas, número da conta compradora.
-Validação: Quantidade de ativo a ser comprada não pode ser maior que a quantidade disponível na corretora.
-
-#### *POST (/investimentos/vender)*
-
-``` 
-{
-  “codCliente”: integer,	// código do cliente (identificador único)
-  “codAtivo”: integer,		// código de identificação única do ativo
-  “qtdeAtivo”: integer,	   // quantidade de ações a serem vendidas
-}
-``` 
-
-  O endpoint recebe como entrada o código do ativo, a quantidade de ações vendidas, número da conta vendedora.
-Validação: Quantidade de ativo a ser vendida não pode ser maior que a quantidade disponível na carteira.
-
-#### *GET BY CLIENT (/ativos/{cod-client})*
-
-```
-{
-  “codCliente”: integer,	// código do cliente (identificador único da pessoa cliente)
-  “codAtivo”: integer,		// código de identificação única do ativo
-  “qtdeAtivo”: integer,	// quantidade de ações que a pessoa cliente possui
-  “Valor”: decimal,		// Valor da ação
-},
-{
-  “codCliente”: integer,	// código do cliente (identificador único da pessoa cliente)
-  “codAtivo”: integer,		// código de identificação única do ativo
-  “qtdeAtivo”: integer,	// quantidade de ações que a pessoa cliente possui
-  “Valor”: decimal,		// Valor da ação
-},
-```
-
-#### *GET BY ASSETS (/ativos/{cod-ativo})*
-```
-{
-  “codAtivo”: integer,		// código de identificação única do ativo
-  “qtdeAtivo”: integer,	// quantidade de ações a serem negociadas
-  “Valor”: decimal,		// Valor da unitário da ação a ser negociada
-}
-```
-### Requisições para depósitos e saques
-
-#### *POST (/conta/deposito)*
-```
-{
-  “codCliente”: integer,	// código do cliente (identificador único)
-  “Valor”: decimal,		// Valor do depósito
-}
-```
-Validação: Quantidade a ser depositada não poderá ser negativa ou igual a zero.
-
-
-#### *POST (/conta/saque)*
-```
-{
-  “codCliente”: integer,	// código do cliente (identificador único)
-  “Valor”: decimal,		// Valor do saque
-}
-```
-Validação: Quantidade a ser sacada não poderá ser maior que o saldo da conta, não pode ser negativa e não pode ser igual a zero.
-
-#### *GET (/conta/{cod-cliente})*
-```
-{
-  “codCliente”: integer,	// código do cliente (identificador único)
-  “Saldo”: decimal,		// Saldo em conta
-}
-```
-
-
-
-
-## Técnologias usadas
-
-Back-end:
-> Desenvolvido usando: NodeJS, ExpressJS, JWT-Json Web Token, MYSQL, ES6
-
-
-## Instalando Dependências
-
-> Backend
-#### Clone o repositório abaixo  para o seu ambiente:
-``` 
-git clone git@github.com:edmurneves/desafioXP.git
-``` 
-#### Acesse o diretorio e faça a instalação das dependências com o comanndo abaixo
-```bash
-npm install
-``` 
-#### Neste projeto foi utilizado um banco de dados MySQL - Seguindo a estrutura de tabelas abaixo.
-
-![image](https://user-images.githubusercontent.com/90069492/180620039-6185ad04-9394-4288-9e91-8378f9fb1b45.png)
-
-
-#### Execute o script do arquivo que se encontra na raiz do projeto para criar o banco de dados da aplicação. 
-#### Utilize o MySQL WorkBench para rodar o script ou rode direto no CLI do MySQL
-``` 
-desafioXP.sql
-``` 
-Configure o arquivo .env com as variáveis do seu ambiente (credenciais do BD e Porta da aplicação)
-A aplicação está rodando por padrão na Porta 3000 e o BD na Porta padrão 3306
-
-## Executando aplicação
-
-* Para rodar o back-end:
-
+  }
   ```
-  npm run dev
+
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados:</strong></summary>
+
+  * **[Será validado que não é possível fazer login sem todos os campos preenchidos]**
+    - Se a requisição não tiver todos os campos devidamente preenchidos(não pode haver campos em branco), o resultado retornado deverá ser conforme exibido abaixo, com um status http `400`:
+    ```json
+    {
+      "message": "Some required fields are missing"
+    }
+    ```
+
+  * **[Será validado que não é possível fazer login com um usuário que não existe]**
+    - Se a requisição receber um par de `email` e `password` errados/inexistentes, o resultado retornado deverá ser conforme exibido abaixo, com um status http `400`:
+    ```json
+    {
+      "message": "Invalid fields"
+    }
+    ```
+  
+  * **[Será validado que é possível fazer login com sucesso]**
+    - Se o login foi feito com sucesso o resultado retornado deverá ser conforme exibido abaixo, com um status http `200`:
+    ```json
+    {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjo1LCJkaXNwbGF5TmFtZSI6InVzdWFyaW8gZGUgdGVzdGUiLCJlbWFpbCI6InRlc3RlQGVtYWlsLmNvbSIsImltYWdlIjoibnVsbCJ9LCJpYXQiOjE2MjAyNDQxODcsImV4cCI6MTYyMDY3NjE4N30.Roc4byj6mYakYqd9LTCozU1hd9k_Vw5IWKGL4hcCVG8"
+    }
+    ```
+    > :warning: O token anterior é fictício, seu token deve ser gerado a partir da variável de ambiente `JWT_SECRET`, do `payload` da requisição e não deve conter o atributo `password` em sua construção.
+
+<br />
+</details>
+
+---
+
+## 4 - Sua aplicação deve ter o endpoint POST `/user`
+
+- O endpoint deve ser acessível através do URL `/user`;
+- O endpoint deve ser capaz de adicionar um novo `user` a sua tabela no banco de dados;
+- O corpo da requisição deverá seguir o formato abaixo:
+  ```json
+  {
+    "displayName": "Brett Wiltshire",
+    "email": "brett@email.com",
+    "password": "123456",
+    "image": "http://4.bp.blogspot.com/_YA50adQ-7vQ/S1gfR_6ufpI/AAAAAAAAAAk/1ErJGgRWZDg/S45/brett.png"
+  }
   ```
-* Para simular as requisições (GET /POST) do front-end, sugerimos o uso do Postman ou Insomia:
-```
-https://www.postman.com/
-https://insomnia.rest/
-```
-### Exemplos de execução utilizando o POSTMAN 
 
-```
-Rota http://localhost:3000/login
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados</strong></summary>
 
-{
-    "email": "edmur@gmail.com",
-    "password": "123456"
-}
+  * **[Será validado que não é possível cadastrar com o campo `displayName` menor que 8 caracteres]**
+    - Se a requisição não tiver o campo `displayName` devidamente preenchido com 8 caracteres ou mais, o resultado retornado deverá ser conforme exibido abaixo, com um status http `400`:
+    ```json
+    {
+      "message": "\"displayName\" length must be at least 8 characters long"
+    }
+    ```
+  
+  * **[Será validado que não é possível cadastrar com o campo `email` com formato inválido]**
+    - Se a requisição não tiver o campo `email` devidamente preenchido com o formato `<prefixo@dominio>`, o resultado retornado deverá ser conforme exibido abaixo, com um status http `400`:
+    ```json
+    {
+      "message": "\"email\" must be a valid email"
+    }
+    ```
 
-Retorno
-{
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2RDbGllbnRlIjoxLCJub21lIjoiRWRtdXIi
-    LCJlbWFpbCI6ImVkbXVyQGdtYWlsLmNvbSIsImlhdCI6MTY1ODcwNDMxNiwiZXhwIjoxNjU4NzkwNzE2fQ.li7r
-    urPex-sxNHUqGZ6NebZa0_zS_Lh0CLLjF_gU9CQ"
-}
+  * **[Será validado que não é possível cadastrar com o campo `password` menor que 6 caracteres]**
+    - Se a requisição não tiver o campo `password` devidamente preenchido com 6 caracteres ou mais, o resultado retornado deverá ser conforme exibido abaixo, com um status http `400`:
+    ```json
+    {
+      "message": "\"password\" length must be at least 6 characters long"
+    }
+    ```
 
-```
-![image](https://user-images.githubusercontent.com/90069492/180670019-43a62c46-47d2-4cbf-9356-42eb1c0f8d41.png)
+  * **[Será validado que não é possível cadastrar com um email já existente]**
+    - Se a requisição enviar o campo `email` com um email que já existe, o resultado retornado deverá ser conforme exibido abaixo, com um status http `409`:
+    ```json
+    {
+      "message": "User already registered"
+    }
+    ```
+  
+  * **[Será validado que é possível cadastrar um pessoa usuária com sucesso]**
+    - Se o user for criado com sucesso o resultado retornado deverá ser conforme exibido abaixo, com um status http `201`:
+    ```json
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjo1LCJkaXNwbGF5TmFtZSI6InVzdWFyaW8gZGUgdGVzdGUiLCJlbWFpbCI6InRlc3RlQGVtYWlsLmNvbSIsImltYWdlIjoibnVsbCJ9LCJpYXQiOjE2MjAyNDQxODcsImV4cCI6MTYyMDY3NjE4N30.Roc4byj6mYakYqd9LTCozU1hd9k_Vw5IWKGL4hcCVG8"
+      }
+      ```
+    > :warning: O token anterior é fictício, seu token deve ser gerado a partir da variável de ambiente `JWT_SECRET`, do `payload` da requisição e não deve conter o atributo `password` em sua construção.
 
-```
-** Essa rota necessita autenticação!! Insira o token na chave Authorization no Postman!!
-Rota http://localhost:3000/conta/c1    //c1 representa cliente 1, c2 cliente 2 etc..
-Retorna o saldo da conta do cliente
-Caso a conta não exista é retornada a mensagem "conta inexistente".
+<br />
+</details>
 
-```
-![image](https://user-images.githubusercontent.com/90069492/180670181-eb1193f0-8918-42f7-9d4d-319bba86bb2c.png)
+---
 
+## :warning: Validando token nas requisições
 
-![image](https://user-images.githubusercontent.com/90069492/180653450-44c0d50d-3447-41b3-a2c2-fbf6e1ac72d3.png)
+- Após termos feito o requisito de criação de `users` e o requisito de `login`, alguns requisitos abaixo vão precisar desta autenticação prévia, para que seja possível consumir o endpoint;
+- Todo requisito que precisar validar o `token` terá o símbolo ☝;
+- **✨ Dica:** Se é algo que vamos utilizar em mais de uma rota, será que podemos separa-lo em algum lugar que comece com `M` de `middleware`? 😜
 
-```
-Rota http://localhost:3000/ativos/c1    //c1 representa cliente 1, c2 cliente 2 etc..
-Retorna os ativos que o cliente possui com suas respectivas quantidades
+<details>
+  <summary id="validandoToken"><strong>Os seguintes pontos serão avaliados</strong></summary>
 
-```
-![image](https://user-images.githubusercontent.com/90069492/180654139-05d26bab-3918-4231-b016-340ecd5d4fe6.png)
+  * **[Será validado que não é possível fazer uma operação sem o token na requisição]**
+    - Se o token for inexistente o resultado retornado deverá ser conforme exibido abaixo, com um status http `401`:
+    ```json
+    {
+      "message": "Token not found"
+    }
+    ```
 
-```
-Rota http://localhost:3000/ativos/a1    //a1 representa o ativo 1 e suas informações.
-Retorna as informações relativas ao ativo da corretora.
+  * **[Será validado que não é possível fazer uma operação com o token inválido]**
+    - Se o token for inválido o resultado retornado deverá ser conforme exibido abaixo, com um status http `401`:
+    ```json
+    {
+      "message": "Expired or invalid token"
+    }
+    ```
 
-```
-![image](https://user-images.githubusercontent.com/90069492/180654278-47ccb9b0-2e56-4e57-a6d7-6bf03c18b8f2.png)
+</details>
 
-```
-Rota http://localhost:3000/investimentos/comprar  // recebe um requisição com os dados informados no body (imagem abaixo).
-Caso todas as regras de negócio sejam cumpridas, retorna a mensagem "Transação efetuada com sucesso"
+---
 
-```
-![image](https://user-images.githubusercontent.com/90069492/180654376-6f7b7af7-3488-44c3-bef1-65921c86be04.png)
+## 5 - Sua aplicação deve ter o endpoint GET `/user`
 
-```
-Rota http://localhost:3000/investimentos/vender  // recebe um requisição com os dados informados no body (imagem abaixo).
-Caso todas as regras de negócio sejam cumpridas, retorna a mensagem "Transação efetuada com sucesso"
+- ☝ Não esqueça de validar o `token` neste requisito, como descrito na seção de [Validando token nas requisições](#validandoToken);
+- O endpoint deve ser acessível através do URL `/user`;
+- O endpoint deve ser capaz de trazer todos `users` do banco de dados;
 
-```
-![image](https://user-images.githubusercontent.com/90069492/180654685-70517c8c-cbd0-448e-993a-800cf2ca8bd5.png)
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados</strong></summary>
 
-```
-** Essa rota necessita autenticação!! Insira o token na chave Authorization no Postman!!
-Rota http://localhost:3000/conta/saque  // recebe um requisição com os dados informados no body (imagem abaixo).
-Caso todas as regras de negócio sejam cumpridas, retorna a mensagem "Saque efetuado com sucesso! Seu saldo atual é de XXXX.XX Reais"
+  * ☝ **[Será validado o token, como descrito na seção de [Validando token nas requisições](#validandoToken)]**
 
-```
-![image](https://user-images.githubusercontent.com/90069492/180654879-ec0f17ce-100d-4c33-8211-aa0b475c15a9.png)
+  * **[Será validado que é possível listar todos os usuários]**
+    - Ao listar usuários com sucesso o resultado retornado deverá ser conforme exibido abaixo, com um status http `200`:
+    ```json
+    [
+      {
+          "id": 1,
+          "displayName": "Lewis Hamilton",
+          "email": "lewishamilton@gmail.com",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/1/18/Lewis_Hamilton_2016_Malaysia_2.jpg"
+      },
 
-```
-** Essa rota necessita autenticação!! Insira o token na chave Authorization no Postman!!
-Rota http://localhost:3000/conta/deposito  // recebe um requisição com os dados informados no body (imagem abaixo).
-Caso todas as regras de negócio sejam cumpridas, retorna a mensagem "Deposito efetuado com sucesso! Seu saldo atual é de XXXX.XX Reais"
+      /* ... */
+    ]
+    ```
 
-```
-![image](https://user-images.githubusercontent.com/90069492/180655012-d877954c-fd6b-4e51-b16b-83c1f8661bc2.png)
+<br />
+</details>
 
+---
 
+## 6 - Sua aplicação deve ter o endpoint GET `/user/:id`
 
+- ☝ Não esqueça de validar o `token` neste requisito, como descrito na seção de [Validando token nas requisições](#validandoToken);
+- O endpoint deve ser acessível através do URL `/user/:id`;
+- O endpoint deve ser capaz de trazer o `user` baseado no `id` do banco de dados se ele existir;
 
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados</strong></summary>
+
+  * ☝ **[Será validado o token, como descrito na seção de [Validando token nas requisições](#validandoToken)]**
+
+  * **[Será validado que é possível listar um usuário específico com sucesso]**
+    - Ao listar um usuário com sucesso o resultado retornado deverá ser conforme exibido abaixo, com um status http `200`:
+    ```json
+    {
+      "id": 1,
+      "displayName": "Lewis Hamilton",
+      "email": "lewishamilton@gmail.com",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/1/18/Lewis_Hamilton_2016_Malaysia_2.jpg"
+    }
+    ```
+
+  * **[Será validado que não é possível listar um usuário inexistente]**
+    - Se o usuário for inexistente o resultado retornado deverá ser conforme exibido abaixo, com um status http `404`:
+    ```json
+    {
+      "message": "User does not exist"
+    }
+    ```
+
+<br />
+</details>
+
+---
+
+## 7 - Crie o modelo 'Category' em 'src/database/models/category.js' com as propriedades corretas
+
+- Sua `model` deve estar no diretório correto e respeitar a nomenclatura pedida no requisito;
+- Sua `model` deve respeitar o _diagrama de Entidade-Relacionamento_ e o _formato das entidades_, como descrito na seção de [Diagrama ER e Entidades](#diagrama).
+
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados</strong></summary>
+
+  * **[Será validado que existe o arquivo 'category.js']**
+
+  * **[Será validado que o modelo possui o nome 'Category']**
+
+  * **[Será validado que o modelo possui a propriedade 'id']**
+
+  * **[Será validado que o modelo possui a propriedade 'name']**
+
+<br />
+</details>
+
+---
+
+## 8 - Sua aplicação deve ter o endpoint POST `/categories`
+
+- ☝ Não esqueça de validar o `token` neste requisito, como descrito na seção de [Validando token nas requisições](#validandoToken);
+- O endpoint deve ser acessível através do URL `/categories`;
+- O endpoint deve ser capaz de adicionar uma nova categoria a sua tabela no banco de dados;
+- O corpo da requisição deverá seguir o formato abaixo:
+  ```json
+  {
+    "name": "Typescript"
+  }
+  ```
+
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados</strong></summary>
+
+  * ☝ **[Será validado o token, como descrito na seção de [Validando token nas requisições](#validandoToken)]**
+
+  * **[Será validado que não é possível cadastrar uma categoria sem o campo `name`]**
+    - Se a requisição não tiver o campo `name` devidamente preenchidos(não pode haver campo em branco), o resultado retornado deverá ser conforme exibido abaixo, com um status http `400`:
+    ```json
+    {
+      "message": "\"name\" is required"
+    }
+    ```
+
+  * **[Será validado que é possível cadastrar uma categoria com sucesso]**
+    - Se a categoria for criada com sucesso o resultado retornado deverá ser conforme exibido abaixo, com um status http `201`:
+    ```json
+    {
+      "id": 3,
+      "name": "Typescript"
+    }
+    ```
+
+<br />
+</details>
+
+---
+
+## 9 - Sua aplicação deve ter o endpoint GET `/categories`
+
+- ☝ Não esqueça de validar o `token` neste requisito, como descrito na seção de [Validando token nas requisições](#validandoToken);
+- O endpoint deve ser acessível através do URL `/categories`;
+- O endpoint deve ser capaz de trazer todas categorias do banco de dados;
+
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados</strong></summary>
+
+  * ☝ **[Será validado o token, como descrito na seção de [Validando token nas requisições](#validandoToken)]**
+
+  * **[Será validado que é possível listar todas as categoria com sucesso]**
+    - Ao listar categorias com sucesso o resultado retornado deverá ser conforme exibido abaixo, com um status http `200`:
+    ```json
+    [
+      {
+          "id": 1,
+          "name": "Inovação"
+      },
+      {
+          "id": 2,
+          "name": "Escola"
+      },
+
+      /* ... */
+    ]
+    ```
+
+<br />
+</details>
+
+---
+
+## 10 - Crie o modelo 'BlogPost' em 'src/database/models/blogPost.js' com as propriedades e associações corretas
+
+- Sua `model` deve estar no diretório correto e respeitar a nomenclatura pedida no requisito;
+- Sua `model` deve respeitar o _diagrama de Entidade-Relacionamento_ e o _formato das entidades_, como descrito na seção de [Diagrama ER e Entidades](#diagrama);
+- Sua `model` deve respeitar a associação correta *(N:1)* com o modelo `User`;
+
+- **✨ Dica:**
+  - Explore como renomear campos no Sequelize;
+
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados</strong></summary>
+
+  * **[Será validado que existe o arquivo 'blogPost.js']**
+
+  * **[Será validado que o modelo possui o nome 'BlogPost']**
+
+  * **[Será validado que o modelo possui a propriedade 'id']**
+
+  * **[Será validado que o modelo possui a propriedade 'title']**
+
+  * **[Será validado que o modelo possui a propriedade 'content']**
+
+  * **[Será validado que o modelo possui a propriedade 'userId']**
+
+  * **[Será validado que o modelo possui a propriedade 'published']**
+
+  * **[Será validado que o modelo possui a propriedade 'updated']**
+
+  * **[Será validado que o modelo em 'blogPost.js', define a associação 'belongsTo', com a entidade de nome 'User']**
+
+  * **[Será validado que o modelo em 'user.js', define a associação 'hasMany', com a entidade de nome 'BlogPost']**
+
+<br />
+</details>
+
+---
+
+## 11 - Crie o modelo 'PostCategory' em 'src/database/models/postCategory.js' com as propriedades e associações corretas
+
+- Sua `model` deve estar no diretório correto e respeitar a nomenclatura pedida no requisito;
+- Sua `model` deve respeitar o _diagrama de Entidade-Relacionamento_ e o _formato das entidades_, como descrito na seção de [Diagrama ER e Entidades](#diagrama);
+- Sua `model` deve respeitar a associação correta *(N:N)* entre o modelo `BlogPost` e o modelo `Category`;
+
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados</strong></summary>
+
+  * **[Será validado que existe o arquivo 'postCategory.js']**
+
+  * **[Será validado que o modelo possui o nome 'PostCategory']**
+
+  * **[Será validado que o modelo possui a propriedade 'postId']**
+
+  * **[Será validado que o modelo possui a propriedade 'categoryId']**
+
+  * **[Será validado que o modelo em 'postCategory.js', através do(s) modelos(s) de nome(s) 'Category; BlogPost', define a associação 'belongsToMany' respectivamente, com o(s) modelo(s) de nome(s) 'BlogPost, Category']**
+
+<br />
+</details>
+
+---
+
+## 12 - Sua aplicação deve ter o endpoint POST `/post`
+
+- ☝ Não esqueça de validar o `token` neste requisito, como descrito na seção de [Validando token nas requisições](#validandoToken);
+- O endpoint deve ser acessível através do URL `/post`;
+- O endpoint deve ser capaz de adicionar um novo blog post e vinculá-lo as categorias em suas tabelas no banco de dados;
+- O corpo da requisição deverá seguir o formato abaixo:
+  ```json
+  {
+    "title": "Latest updates, August 1st",
+    "content": "The whole text for the blog post goes here in this key",
+    "categoryIds": [1, 2]
+  }
+  ```
+  
+
+- **✨ Dicas:**
+  - Explore outros [find na documentação do Sequelize](https://sequelize.org/docs/v6/core-concepts/model-querying-finders/#findandcountall);
+  - Explore outros [insert na documentação do Sequelize](https://sequelize.org/docs/v6/core-concepts/model-querying-basics/#creating-in-bulk);
+  - Explore a seção [Transações do dia 24.2 no course](https://app.betrybe.com/course/back-end/nodejs-orm-autenticacao/orm-associations/043e2e8a-c28e-4b95-a949-b7c43221ca8d/conteudos/5a2fce85-9b17-4061-8859-47da08ed1155/transacoes/e0bbdd2e-97ea-4a9d-8f90-4feab0e5657d?use_case=side_bar), essa seção vai deixar suas aplicações com mais confiablidade e atomicidade, quando o assunto for transações de banco de dados;
+
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados</strong></summary>
+
+  * ☝ **[Será validado o token, como descrito na seção de [Validando token nas requisições](#validandoToken)]**
+
+  * **[Será validado que não é possível cadastrar sem todos os campos preenchidos]**
+    - Se a requisição não tiver todos os campos devidamente preenchidos(não pode haver campos em branco), o resultado retornado deverá ser conforme exibido abaixo, com um status http `400`:
+    ```json
+    {
+      "message": "Some required fields are missing"
+    }
+    ```
+
+  * **[Será validado que não é possível cadastrar um blogpost com uma `categoryIds` inexistente]**
+    - Se a requisição não tiver o campo `categoryIds` devidamente preenchido com um array com pelo menos uma categoria que exista, o resultado retornado deverá ser conforme exibido abaixo, com um status http `400``:
+    ```json
+    {
+      "message": "\"categoryIds\" not found"
+    }
+    ```
+
+  * **[Será validado que é possível cadastrar um blogpost com sucesso]**
+  - Se o blog post for criado com sucesso o resultado retornado deverá ser conforme exibido abaixo, com um status http `201`:
+  ```json
+  {
+    "id": 3,
+    "title": "Latest updates, August 1st",
+    "content": "The whole text for the blog post goes here in this key",
+    "userId": 1,
+    "updated": "2022-05-18T18:00:01.196Z",
+    "published": "2022-05-18T18:00:01.196Z"
+  }
+  ```
+
+<br />
+</details>
+
+---
+
+## 13 - Sua aplicação deve ter o endpoint GET `/post`
+
+- ☝ Não esqueça de validar o `token` neste requisito, como descrito na seção de [Validando token nas requisições](#validandoToken);
+- O endpoint deve ser acessível através do URL `/post`;
+- O endpoint deve ser capaz de trazer todos os bogs post, user dono dele e as categorias do banco de dados;
+
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados</strong></summary>
+
+  * ☝ **[Será validado o token, como descrito na seção de [Validando token nas requisições](#validandoToken)]**
+
+  * **[Será validado que é possível listar blogpost com sucesso]**
+    - Ao listar posts com sucesso o resultado retornado deverá ser conforme exibido abaixo, com um status http `200`:
+    ```json
+    [
+      {
+        "id": 1,
+        "title": "Post do Ano",
+        "content": "Melhor post do ano",
+        "userId": 1,
+        "published": "2011-08-01T19:58:00.000Z",
+        "updated": "2011-08-01T19:58:51.000Z",
+        "user": {
+          "id": 1,
+          "displayName": "Lewis Hamilton",
+          "email": "lewishamilton@gmail.com",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/1/18/Lewis_Hamilton_2016_Malaysia_2.jpg"
+        },
+        "categories": [
+          {
+            "id": 1,
+            "name": "Inovação"
+          }
+        ]
+      },
+      
+      /* ... */
+    ]
+    ```
+
+<br />
+</details>
+
+---
+
+## 14 - Sua aplicação deve ter o endpoint GET `/post/:id`
+
+- ☝ Não esqueça de validar o `token` neste requisito, como descrito na seção de [Validando token nas requisições](#validandoToken);
+- O endpoint deve ser acessível através do URL `/post/:id`;
+- O endpoint deve ser capaz de trazer o blog post baseado no `id` do banco de dados se ele existir;
+
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados</strong></summary>
+
+  * ☝ **[Será validado o token, como descrito na seção de [Validando token nas requisições](#validandoToken)]**
+
+  * **[Será validado que é possível listar um blogpost com sucesso]**
+    - Ao listar um post com sucesso o resultado retornado deverá ser conforme exibido abaixo, com um status http `200`:
+    ```json
+    {
+      "id": 1,
+      "title": "Post do Ano",
+      "content": "Melhor post do ano",
+      "userId": 1,
+      "published": "2011-08-01T19:58:00.000Z",
+      "updated": "2011-08-01T19:58:51.000Z",
+      "user": {
+          "id": 1,
+          "displayName": "Lewis Hamilton",
+          "email": "lewishamilton@gmail.com",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/1/18/Lewis_Hamilton_2016_Malaysia_2.jpg"
+      },
+      "categories": [
+          {
+              "id": 1,
+              "name": "Inovação"
+          }
+      ]
+    }
+    ```
+
+  * **[Será validado que não é possível listar um blogpost inexistente]**
+    - Se o post for inexistente o resultado retornado deverá ser conforme exibido abaixo, com um status http `404`:
+    ```json
+    {
+      "message": "Post does not exist"
+    }
+    ```
+
+<br />
+</details>
+
+---
+
+## 15 - Sua aplicação deve ter o endpoint PUT `/post/:id`
+
+- ☝ Não esqueça de validar o `token` neste requisito, como descrito na seção de [Validando token nas requisições](#validandoToken);
+- O endpoint deve ser acessível através do URL `/post/:id`;
+- O endpoint deve ser capaz de alterar um post do banco de dados, se ele existir;
+- Sua aplicação só deve permitir a alteração de um blog post caso a pessoa seja dona dele;
+- Sua aplicação não deve permitir a alteração das categorias do post, somente os atributos `title` e `content` podem ser alterados;
+- O corpo da requisição deverá seguir o formato abaixo:
+  ```json
+  {
+    "title": "Latest updates, August 1st",
+    "content": "The whole text for the blog post goes here in this key"
+  }
+  ```
+  
+
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados</strong></summary>
+
+  * ☝ **[Será validado o token, como descrito na seção de [Validando token nas requisições](#validandoToken)]**
+
+  * **[Será validado que não é possível editar um blogpost com outro usuário]**
+    - Somente o user que criou o blog post poderá editá-lo, o resultado retornado deverá ser conforme exibido abaixo, com um status http `401`
+    ```json
+      {
+        "message": "Unauthorized user"
+      }
+    ```
+
+  * **[Será validado que não é possível editar sem todos os campos preenchidos]**
+    - Se a requisição não tiver todos os campos devidamente preenchidos(não pode haver campos em branco), o resultado retornado deverá ser conforme exibido abaixo, com um status http `400`:
+    ```json
+    {
+      "message": "Some required fields are missing"
+    }
+    ```
+
+  * **[Será validado que é possível editar um blogpost com sucesso]**
+    - Se o blog post for alterado com sucesso o resultado retornado deverá ser conforme exibido abaixo, com um status http `200`:
+    ```json
+    {
+      "id": 3,
+      "title": "Latest updates, August 1st",
+      "content": "The whole text for the blog post goes here in this key",
+      "userId": 1,
+      "published": "2022-05-18T18:00:01.000Z",
+      "updated": "2022-05-18T18:07:32.000Z",
+      "user": {
+        "id": 1,
+        "displayName": "Lewis Hamilton",
+        "email": "lewishamilton@gmail.com",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/1/18/Lewis_Hamilton_2016_Malaysia_2.jpg"
+      },
+      "categories": [
+        {
+          "id": 1,
+          "name": "Inovação"
+        },
+        {
+          "id": 2,
+          "name": "Escola"
+        }
+      ]
+    }
+    ```
+
+<br />
+</details>
+
+---
+
+# Requisitos Bônus
+
+## 16 - Sua aplicação deve ter o endpoint DELETE `/post/:id`
+
+- ☝ Não esqueça de validar o `token` neste requisito, como descrito na seção de [Validando token nas requisições](#validandoToken);
+- O endpoint deve ser acessível através do URL `/post/:id`;
+- O endpoint deve ser capaz de deletar um blog post baseado no `id` do banco de dados se ele existir;
+- Sua aplicação só deve permitir a deleção de um blog post caso a pessoa seja dona dele;
+
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados</strong></summary>
+
+  * ☝ **[Será validado o token, como descrito na seção de [Validando token nas requisições](#validandoToken)]**
+
+  * **[Será validado que não é possível deletar um blogpost com outro usuário]**
+    - Somente o user que criou o blog post poderá deletá-lo, o resultado retornado deverá ser conforme exibido abaixo, com um status http `401`
+    ```json
+      {
+        "message": "Unauthorized user"
+      }
+    ```
+
+  * **[Será validado que é possível deletar um blogpost com sucesso]**
+    - Se o blog post for deletado com sucesso não deve ser retornada nenhuma resposta, apenas um status http `204`:
+
+  * **[Será validado que não é possível deletar um blogpost inexistente]**
+    - Se o post for inexistente o resultado retornado deverá ser conforme exibido abaixo, com um status http `404`:
+    ```json
+    {
+      "message": "Post does not exist"
+    }
+    ```
+
+<br />
+</details>
+
+---
+
+## 17 - Sua aplicação deve ter o endpoint DELETE `/user/me`
+
+- ☝ Não esqueça de validar o `token` neste requisito, como descrito na seção de [Validando token nas requisições](#validandoToken);
+- O endpoint deve ser acessível através do URL `/user/me`;
+- O endpoint deve ser capaz de deletar você do banco de dados, baseado no `id` que esta dentro do seu `token`;
+- Sua aplicação deve ser capaz de utilizar o token de autenticação nos headers, para saber o user logado correspondente á ser apagado;
+
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados</strong></summary>
+
+  * ☝ **[Será validado o token, como descrito na seção de [Validando token nas requisições](#validandoToken)]**
+
+  * **[Será validado que é possível excluir meu usuário com sucesso]**
+    - Se o user for deletado com sucesso não deve ser retornada nenhuma resposta, apenas um status http `204`:
+
+<br />
+</details>
+
+---
+
+## 18 - Sua aplicação deve ter o endpoint GET `/post/search?q=:searchTerm`
+
+- ☝ Não esqueça de validar o `token` neste requisito, como descrito na seção de [Validando token nas requisições](#validandoToken);
+- O endpoint deve ser acessível através do URL `/post/search`;
+- O endpoint deve ser capaz de trazer os blogs post baseados no `q` do banco de dados, se ele existir;
+- Sua aplicação deve ser capaz de retornar um array de blogs post que contenham em seu título ou conteúdo o termo passado na URL;
+- Sua aplicação deve ser capaz de retornar um array vázio caso nenhum blog post satisfaça a busca;
+- O query params da requisição deverá seguir o formato abaixo:
+  ```js
+    http://localhost:PORT/post/search?q=vamos
+  ```
+
+- **✨ Dica:**
+  - Explore como fazer LIKE no Sequelize igual aprendemos no [dia 20.3 - Pesquisas mais dinâmicas e maleáveis com LIKE do course](https://app.betrybe.com/course/back-end/introducao-a-sql/filtrando-dados-de-forma-especifica/9464be4d-cfd8-4fd0-9b31-f037b3c62bff/conteudos/8ab54a4e-f823-4998-a267-297ff542de96/como-criar-pesquisas-mais-dinamicas-e-maleaveis-usando-o-like/1aee7e62-e43f-4a51-ad03-d064dcc68aed?use_case=side_bar);
+
+<details>
+  <summary><strong>Os seguintes pontos serão avaliados</strong></summary>
+
+  * ☝ **[Será validado o token, como descrito na seção de [Validando token nas requisições](#validandoToken)]**
+
+  * **[Será validado que é possível buscar um blogpost pelo `title`]**
+    - Se a buscar for pelo `title` o resultado retornado deverá ser conforme exibido abaixo, com um status http `200`:
+    ```json
+    // GET /post/search?q=Vamos que vamos
+
+    [
+      {
+        "id": 2,
+        "title": "Vamos que vamos",
+        "content": "Foguete não tem ré",
+        "userId": 1,
+        "published": "2011-08-01T19:58:00.000Z",
+        "updated": "2011-08-01T19:58:51.000Z",
+        "user": {
+          "id": 1,
+          "displayName": "Lewis Hamilton",
+          "email": "lewishamilton@gmail.com",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/1/18/Lewis_Hamilton_2016_Malaysia_2.jpg"
+        },
+        "categories": [
+          {
+            "id": 2,
+            "name": "Escola"
+          }
+        ]
+      }
+    ]
+    ```
+
+  * **[Será validado que é possível buscar um blogpost pelo `content`]**
+    - Se a buscar for pelo `content` o resultado retornado deverá ser conforme exibido abaixo, com um status http `200`:
+    ```json
+      // GET /post/search?q=Foguete não tem ré
+
+      [
+        {
+          "id": 2,
+          "title": "Vamos que vamos",
+          "content": "Foguete não tem ré",
+          "userId": 1,
+          "published": "2011-08-01T19:58:00.000Z",
+          "updated": "2011-08-01T19:58:51.000Z",
+          "user": {
+            "id": 1,
+            "displayName": "Lewis Hamilton",
+            "email": "lewishamilton@gmail.com",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/1/18/Lewis_Hamilton_2016_Malaysia_2.jpg"
+          },
+          "categories": [
+            {
+              "id": 2,
+              "name": "Escola"
+            }
+          ]
+        }
+      ]
+    ```
+
+  * **[Será validado que é possível buscar todos os blogpost quando passa a busca vazia]**
+    - Se a buscar for vazia o resultado retornado deverá ser conforme exibido abaixo, com um status http `200`:
+    ```json
+      // GET /post/search?q=
+
+      [
+        {
+          "id": 1,
+          "title": "Post do Ano",
+          "content": "Melhor post do ano",
+          "userId": 1,
+          "published": "2011-08-01T19:58:00.000Z",
+          "updated": "2011-08-01T19:58:51.000Z",
+          "user": {
+            "id": 1,
+            "displayName": "Lewis Hamilton",
+            "email": "lewishamilton@gmail.com",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/1/18/Lewis_Hamilton_2016_Malaysia_2.jpg"
+          },
+          "categories": [
+            {
+              "id": 1,
+              "name": "Inovação"
+            }
+          ]
+        },
+        
+        /* ... */
+      ]
+    ```
+
+  * **[Será validado que é possível buscar um blogpost inexistente e retornar array vazio]**
+    - Se a buscar um post inexistente o resultado retornado deverá ser conforme exibido abaixo, com um status http `200`:
+    ```json
+      // GET /post/search?q=BATATA
+
+      []
+    ```
+
+</details>
 
 
 
